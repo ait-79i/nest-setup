@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 const passwordRegEx =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,20}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
 
 export class CreateUserDto {
   @IsString()
@@ -26,8 +26,9 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @IsEnum(['f', 'm', 'u'])
-  role: string;
+  @IsNotEmpty()
+  @MinLength(5, { message: 'Phone number must have at least 5 characters.' })
+  phone: string;
 
   @IsNotEmpty()
   @Matches(passwordRegEx, {
