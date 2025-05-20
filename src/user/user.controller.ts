@@ -8,11 +8,16 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Permissions } from 'src/auth/decorators/permissions.decorator';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -22,6 +27,8 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 
 @ApiTags('users')
@@ -74,7 +81,89 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ description: 'User has been successfully deleted' })
   @ApiNotFoundResponse({ description: 'User not found' })
+  @UseGuards(PermissionsGuard)
+  @Permissions('delete:users')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  @Post(':id/roles')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Assign roles to a user' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        roleIds: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of role IDs to assign to the user',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Roles assigned successfully' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiForbiddenResponse({ description: 'Forbidden - insufficient permissions' })
+  @UseGuards(PermissionsGuard)
+  @Permissions('manage:user_roles')
+  assignRoles(@Param('id') id: string, @Body('roleIds') roleIds: string[]) {
+    return this.userService.assignRolesToUser(id, roleIds);
+  }
+
+  @Delete(':id/roles')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove roles from a user' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        roleIds: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Array of role IDs to remove from the user',
+        },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Roles removed successfully' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiForbiddenResponse({ description: 'Forbidden - insufficient permissions' })
+  @UseGuards(PermissionsGuard)
+  @Permissions('manage:user_roles')
+  removeRoles(@Param('id') id: string, @Body('roleIds') roleIds: string[]) {
+    return this.userService.removeRolesFromUser(id, roleIds);
+  }
+
+  @Get(':id/roles')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get user roles' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiOkResponse({ description: 'User roles retrieved successfully' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  getUserRoles(@Param('id') id: string) {
+    return this.userService.findOne(id).then((user) => user.roles);
+  }
+
+  @Get(':id/permissions')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get user permissions (derived from roles)' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiOkResponse({ description: 'User permissions retrieved successfully' })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  async getUserPermissions(@Param('id') id: string) {
+    const user = await this.userService.findOne(id);
+
+    // Extract unique permissions from all user roles
+    const permissionsMap = new Map();
+    user.roles.forEach((role) => {
+      role.permissions.forEach((permission) => {
+        permissionsMap.set(permission.id, permission);
+      });
+    });
+
+    return Array.from(permissionsMap.values());
   }
 }
