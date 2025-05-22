@@ -3,7 +3,6 @@ import {
   MinLength,
   IsNotEmpty,
   IsEmail,
-  IsEnum,
   Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -11,7 +10,7 @@ import { ApiProperty } from '@nestjs/swagger';
 const passwordRegEx =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
 
-export class CreateUserDto {
+export class CreateUtilisateurDto {
   @ApiProperty({
     description: 'User first name',
     example: 'John',
@@ -55,7 +54,8 @@ export class CreateUserDto {
   phone: string;
 
   @ApiProperty({
-    description: 'User password (min 8 chars, max 20 chars, must include uppercase, lowercase, number, and special character)',
+    description:
+      'User password (min 8 chars, max 20 chars, must include uppercase, lowercase, number, and special character)',
     example: 'Pass@word123',
     required: true,
     minLength: 8,

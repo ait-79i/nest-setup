@@ -1,62 +1,157 @@
 /**
- * Initial permissions data for seeding the database
+ * Données initiales des permissions pour peupler la base de données
  */
 export const initialPermissions = [
-  // User permissions
-  { name: 'create:users', resource: 'users', action: 'create', description: 'Create new users' },
-  { name: 'read:users', resource: 'users', action: 'read', description: 'Read user information' },
-  { name: 'update:users', resource: 'users', action: 'update', description: 'Update user information' },
-  { name: 'delete:users', resource: 'users', action: 'delete', description: 'Delete users' },
-  { name: 'manage:user_roles', resource: 'users', action: 'manage', description: 'Assign or remove roles from users' },
-  
-  // Role permissions
-  { name: 'create:roles', resource: 'roles', action: 'create', description: 'Create new roles' },
-  { name: 'read:roles', resource: 'roles', action: 'read', description: 'Read role information' },
-  { name: 'update:roles', resource: 'roles', action: 'update', description: 'Update role information' },
-  { name: 'delete:roles', resource: 'roles', action: 'delete', description: 'Delete roles' },
-  { name: 'manage:role_permissions', resource: 'roles', action: 'manage', description: 'Assign or remove permissions from roles' },
-  
-  // Permission permissions
-  { name: 'create:permissions', resource: 'permissions', action: 'create', description: 'Create new permissions' },
-  { name: 'read:permissions', resource: 'permissions', action: 'read', description: 'Read permission information' },
-  { name: 'update:permissions', resource: 'permissions', action: 'update', description: 'Update permission information' },
-  { name: 'delete:permissions', resource: 'permissions', action: 'delete', description: 'Delete permissions' },
-  
-  // System permissions
-  { name: 'access:admin', resource: 'system', action: 'access', description: 'Access admin features' },
-  { name: 'manage:system', resource: 'system', action: 'manage', description: 'Manage system settings' },
+  // Permissions Enseigne
+  {
+    name: 'create:enseigne',
+    resource: 'enseigne',
+    action: 'create',
+    description: 'Créer une nouvelle enseigne',
+  },
+  {
+    name: 'update:enseigne',
+    resource: 'enseigne',
+    action: 'update',
+    description: 'Modifier une enseigne existante',
+  },
+  {
+    name: 'delete:enseigne',
+    resource: 'enseigne',
+    action: 'delete',
+    description: 'Supprimer une enseigne',
+  },
+
+  // Permissions Administrateur Enseigne
+  {
+    name: 'create:admin_enseigne',
+    resource: 'admin_enseigne',
+    action: 'create',
+    description: 'Créer un nouvel administrateur enseigne',
+  },
+  {
+    name: 'update:admin_enseigne',
+    resource: 'admin_enseigne',
+    action: 'update',
+    description: 'Modifier un administrateur enseigne',
+  },
+  {
+    name: 'delete:admin_enseigne',
+    resource: 'admin_enseigne',
+    action: 'delete',
+    description: 'Supprimer un administrateur enseigne',
+  },
+
+  // Permissions Base documentaire
+  {
+    name: 'create:document',
+    resource: 'document',
+    action: 'create',
+    description: 'Ajouter de nouveaux documents',
+  },
+  {
+    name: 'update:document',
+    resource: 'document',
+    action: 'update',
+    description: 'Modifier des documents existants',
+  },
+  {
+    name: 'delete:document',
+    resource: 'document',
+    action: 'delete',
+    description: 'Supprimer des documents',
+  },
+
+  // Permissions ICE Animation
+  {
+    name: 'access:ice_animation',
+    resource: 'ice_animation',
+    action: 'access',
+    description: 'Accéder à ICE ANIMATION pour poser des questions',
+  },
+
+  // Permissions Assistant
+  {
+    name: 'create:assistant',
+    resource: 'assistant',
+    action: 'create',
+    description: 'Créer de nouveaux assistants conversationnels',
+  },
+  {
+    name: 'update:assistant',
+    resource: 'assistant',
+    action: 'update',
+    description: 'Modifier des assistants existants',
+  },
+  {
+    name: 'delete:assistant',
+    resource: 'assistant',
+    action: 'delete',
+    description: 'Supprimer des assistants',
+  },
+
+  // Permissions Franchise
+  {
+    name: 'create:franchise',
+    resource: 'franchise',
+    action: 'create',
+    description: 'Créer de nouvelles franchises',
+  },
+  {
+    name: 'update:franchise',
+    resource: 'franchise',
+    action: 'update',
+    description: 'Modifier des franchises existantes',
+  },
+  {
+    name: 'delete:franchise',
+    resource: 'franchise',
+    action: 'delete',
+    description: 'Supprimer des franchises',
+  },
 ];
 
 /**
- * Initial roles data for seeding the database
+ * Données initiales des rôles pour peupler la base de données
  */
 export const initialRoles = [
   {
-    name: 'admin',
-    description: 'Administrator with full access',
+    name: 'super_administrateur',
+    description:
+      "Collaborateur BANQUISE ayant tous les droits d'administration sur les ICE de chaque enseigne",
     isDefault: false,
     permissions: [
-      'create:users', 'read:users', 'update:users', 'delete:users', 'manage:user_roles',
-      'create:roles', 'read:roles', 'update:roles', 'delete:roles', 'manage:role_permissions',
-      'create:permissions', 'read:permissions', 'update:permissions', 'delete:permissions',
-      'access:admin', 'manage:system'
-    ]
+      'create:enseigne',
+      'update:enseigne',
+      'delete:enseigne',
+      'create:admin_enseigne',
+      'update:admin_enseigne',
+      'delete:admin_enseigne',
+      'create:document',
+      'update:document',
+      'delete:document',
+      'access:ice_animation',
+      'create:assistant',
+      'update:assistant',
+      'delete:assistant',
+      'create:franchise',
+      'update:franchise',
+      'delete:franchise',
+    ],
   },
   {
-    name: 'editor',
-    description: 'Editor with content management privileges',
+    name: 'administrateur_enseigne',
+    description:
+      'Responsable ICE chez le franchiseur avec des droits étendus mais limités à son enseigne',
     isDefault: false,
     permissions: [
-      'read:users',
-      'read:roles', 'read:permissions'
-    ]
+      'access:ice_animation',
+      'create:assistant',
+      'update:assistant',
+      'delete:assistant',
+      'create:franchise',
+      'update:franchise',
+      'delete:franchise',
+    ],
   },
-  {
-    name: 'user',
-    description: 'Regular user with basic access',
-    isDefault: true,
-    permissions: [
-      'read:users'
-    ]
-  }
 ];

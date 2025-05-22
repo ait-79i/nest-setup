@@ -11,7 +11,6 @@ import {
 import { Public } from './decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto } from '../user/dto/create-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
@@ -26,6 +25,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { CreateUtilisateurDto } from 'src/utilisateur/dto/create-utilisateur.dto';
 
 // Extend the Express Request type to include the user property
 declare module 'express' {
@@ -43,10 +43,10 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: CreateUtilisateurDto })
   @ApiCreatedResponse({ description: 'User successfully registered' })
   @ApiConflictResponse({ description: 'Email already exists' })
-  async register(@Body() createUserDto: CreateUserDto) {
+  async register(@Body() createUserDto: CreateUtilisateurDto) {
     try {
       return await this.authService.register(createUserDto);
     } catch (error) {

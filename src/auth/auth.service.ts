@@ -1,29 +1,26 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { UserService } from '../user/user.service';
-import { User } from '../user/entities/user.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { LoginDto } from './dto/login.dto';
-import { CreateUserDto } from '../user/dto/create-user.dto';
+import { UtilisateurService } from 'src/utilisateur/utilisateur.service';
+import { CreateUtilisateurDto } from 'src/utilisateur/dto/create-utilisateur.dto';
+import { Utilisateur } from 'src/utilisateur/entities/utilisateur.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    private readonly userService: UtilisateurService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     @InjectRepository(RefreshToken)
     private refreshTokenRepository: Repository<RefreshToken>,
   ) {}
 
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUtilisateurDto) {
     // Create the user
     const user = await this.userService.create(createUserDto);
 
@@ -32,7 +29,7 @@ export class AuthService {
     await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     // Remove the password from the response
-    const { password, ...result } = user;
+    const { motDePasse, ...result } = user;
 
     return {
       user: result,
@@ -54,8 +51,8 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.prenom,
+        lastName: user.nom,
       },
       ...tokens,
     };
@@ -64,7 +61,7 @@ export class AuthService {
   async refreshTokens(userId: string, refreshToken: string) {
     const user = await this.userService.findOne(userId);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('Utilisateur not found');
     }
 
     const storedRefreshToken = await this.findRefreshToken(
@@ -102,13 +99,13 @@ export class AuthService {
   private async validateUser(
     email: string,
     password: string,
-  ): Promise<User | null> {
+  ): Promise<Utilisateur | null> {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       return null;
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.motDePasse);
     if (!isPasswordValid) {
       return null;
     }
@@ -116,7 +113,7 @@ export class AuthService {
     return user;
   }
 
-  private async generateTokens(user: User) {
+  private async generateTokens(user: Utilisateur) {
     const [accessToken, refreshToken] = await Promise.all([
       this.generateAccessToken(user),
       this.generateRefreshToken(user),
@@ -128,7 +125,7 @@ export class AuthService {
     };
   }
 
-  private async generateAccessToken(user: User): Promise<string> {
+  private async generateAccessToken(user: Utilisateur): Promise<string> {
     const payload = {
       sub: user.id,
       email: user.email,
@@ -137,7 +134,7 @@ export class AuthService {
     return this.jwtService.signAsync(payload);
   }
 
-  private async generateRefreshToken(user: User): Promise<string> {
+  private async generateRefreshToken(user: Utilisateur): Promise<string> {
     const payload = {
       sub: user.id,
     };

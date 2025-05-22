@@ -1,17 +1,20 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { UserService } from '../../user/user.service';
+import { UtilisateurService } from 'src/utilisateur/utilisateur.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private userService: UserService,
+    private utilisateurService: UtilisateurService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
-    
+    const requiredRoles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
+
     // If no roles are required, allow access
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
@@ -27,7 +30,7 @@ export class RolesGuard implements CanActivate {
 
     // Check each required role
     for (const roleName of requiredRoles) {
-      const hasRole = await this.userService.hasRole(user.id, roleName);
+      const hasRole = await this.utilisateurService.hasRole(user.id, roleName);
       if (hasRole) {
         return true; // User has at least one of the required roles
       }

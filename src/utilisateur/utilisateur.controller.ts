@@ -10,13 +10,7 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Permissions } from 'src/auth/decorators/permissions.decorator';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { PermissionsGuard } from 'src/auth/guards/permissions.guard';
 import {
   ApiBearerAuth,
@@ -27,22 +21,24 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  ApiUnauthorizedResponse,
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
+import { UtilisateurService } from './utilisateur.service';
+import { CreateUtilisateurDto } from './dto/create-utilisateur.dto';
+import { UpdateUtilisateurDto } from './dto/update-utilisateur.dto';
 
 @ApiTags('users')
 @ApiBearerAuth('JWT-auth')
 @Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+export class UtilisateurController {
+  constructor(private readonly userService: UtilisateurService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: CreateUtilisateurDto })
   @ApiCreatedResponse({ description: 'User has been successfully created' })
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUtilisateurDto) {
     return this.userService.create(createUserDto);
   }
 
@@ -68,10 +64,10 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update a user' })
   @ApiParam({ name: 'id', description: 'User ID' })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UpdateUtilisateurDto })
   @ApiOkResponse({ description: 'User has been successfully updated' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUtilisateurDto) {
     return this.userService.update(id, updateUserDto);
   }
 

@@ -3,10 +3,11 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Permission } from './permission.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Utilisateur } from 'src/utilisateur/entities/utilisateur.entity';
 
 @Entity('roles')
 export class Role {
@@ -22,33 +23,33 @@ export class Role {
   @Column({ nullable: true })
   description: string;
 
-  @ApiProperty({ description: 'Whether this is a default role assigned to new users' })
+  @ApiProperty({
+    description: 'Whether this is a default role assigned to new users',
+  })
   @Column({ default: false })
   isDefault: boolean;
 
-  @ManyToMany(() => Permission, permission => permission.roles, {
+  @ManyToMany(() => Permission, (permission) => permission.roles, {
     cascade: true,
-    eager: true
+    eager: true,
   })
   @JoinTable({
     name: 'roles_permissions',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
   })
   permissions: Permission[];
 
-  // Users will be defined through a join table from the User entity
-  // Avoiding direct reference here to prevent circular dependency
-  @ManyToMany('User', 'roles')
-  users: any[];
+  @ManyToMany(() => Utilisateur, (usr) => usr.roles)
+  utilisateurs: any[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ 
-    type: 'timestamp', 
+  @Column({
+    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP' 
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
 }

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,6 +10,10 @@ import { JwtAuthGlobalGuard } from './auth/guards/jwt-auth.global.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { PermissionsGuard } from './auth/guards/permissions.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SeedModule } from './seeds/seed.module';
+import { UtilisateurModule } from './utilisateur/utilisateur.module';
+import { EnseigneModule } from './enseigne/enseigne.module';
+import { StatutModule } from './statut/statut.module';
 
 @Module({
   imports: [
@@ -30,9 +33,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         };
       },
     }),
-    UserModule, // Load User module first since other entities depend on User
+    UtilisateurModule, // Load User module first since other entities depend on User
     RolesModule, // Load Roles module next since Auth depends on both User and Roles
-    AuthModule, // Load Auth module last since it depends on User entity
+    AuthModule,
+    EnseigneModule,
+    StatutModule, // Load Auth module last since it depends on User entity
+    SeedModule, // Load Seed module to initialize data
   ],
   controllers: [AppController],
   providers: [
